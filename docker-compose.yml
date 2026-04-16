@@ -1,0 +1,55 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: speech-mysql
+    environment:
+      MYSQL_DATABASE: speech_demo
+      MYSQL_USER: speech_user
+      MYSQL_PASSWORD: speech_pass
+      MYSQL_ROOT_PASSWORD: rootpass
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-prootpass"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  python-stt:
+    build:
+      context: ./python-stt
+    container_name: speech-python-stt
+    environment:
+      WHISPER_MODEL: base
+    ports:
+      - "8000:8000"
+
+  spring-api:
+    build:
+      context: ./spring-api
+    container_name: speech-spring-api
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/speech_demo?createDatabaseIfNotExist=true
+      DB_USERNAME: speech_user
+      DB_PASSWORD: speech_pass
+      STT_SERVICE_URL: http://python-stt:8000/transcribe
+      APP_UPLOAD_DIR: /tmp/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+      python-stt:
+        condition: service_started
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: speech-frontend
+    depends_on:
+      spring-api:
+        condition: service_started
+    ports:
+      - "5173:5173"
