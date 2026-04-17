@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from "react";
 const API_BASE = "http://localhost:8080/api/transcripts";
 
 export default function App() {
-  const [language, setLanguage] = useState("auto");
   const [keywords, setKeywords] = useState("");
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -13,18 +12,6 @@ export default function App() {
   const mediaRecorderRef = useRef(null);
   const mediaStreamRef = useRef(null);
   const chunksRef = useRef([]);
-  const languageOptions = [
-    { value: "auto", label: "Auto detect" },
-    { value: "en", label: "English" },
-    { value: "hi", label: "Hindi" },
-    { value: "es", label: "Spanish" },
-    { value: "fr", label: "French" },
-    { value: "de", label: "German" },
-    { value: "it", label: "Italian" },
-    { value: "pt", label: "Portuguese" },
-    { value: "ja", label: "Japanese" },
-    { value: "ko", label: "Korean" }
-  ];
 
   async function loadTranscripts() {
     const res = await fetch(API_BASE);
@@ -50,7 +37,7 @@ export default function App() {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("language", language);
+      formData.append("language", "en");
       formData.append("keywords", keywords);
 
       const res = await fetch(`${API_BASE}/upload`, {
@@ -135,18 +122,8 @@ export default function App() {
     <main className="page">
       <section className="card">
         <h1>Audio to Text POC</h1>
-        <p>Click the microphone to start recording, then finish to transcribe.</p>
+        <p>Click the microphone to start recording, then finish to transcribe (English).</p>
         <div className="controls">
-          <label className="field">
-            <span>Language</span>
-            <select value={language} onChange={(e) => setLanguage(e.target.value)} disabled={isLoading}>
-              {languageOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
           <label className="field field-wide">
             <span>Custom Words (optional)</span>
             <input
@@ -187,7 +164,7 @@ export default function App() {
 
       <section className="card">
         <h2>Upload Audio File</h2>
-        <p>Select an existing audio file and transcribe it using the same language settings.</p>
+        <p>Select an existing audio file and transcribe it in English.</p>
         <div className="controls">
           <input
             id="audio-file-input"
@@ -210,7 +187,14 @@ export default function App() {
             {items.map((t) => (
               <li key={t.id}>
                 <small>Recorded at: {new Date(t.createdAt).toLocaleString()}</small>
-                <p>{t.transcript}</p>
+                {t.formattedHtml ? (
+                  <div
+                    className="document-preview"
+                    dangerouslySetInnerHTML={{ __html: t.formattedHtml }}
+                  />
+                ) : (
+                  <p>{t.transcript}</p>
+                )}
               </li>
             ))}
           </ul>

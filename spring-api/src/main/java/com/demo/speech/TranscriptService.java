@@ -14,15 +14,18 @@ import java.util.List;
 public class TranscriptService {
     private final TranscriptRepository repository;
     private final SttClient sttClient;
+    private final TranscriptFormatterService formatterService;
     private final Path uploadDir;
 
     public TranscriptService(
             TranscriptRepository repository,
             SttClient sttClient,
+            TranscriptFormatterService formatterService,
             @Value("${app.upload-dir}") String uploadDir
     ) throws IOException {
         this.repository = repository;
         this.sttClient = sttClient;
+        this.formatterService = formatterService;
         this.uploadDir = Path.of(uploadDir);
         Files.createDirectories(this.uploadDir);
     }
@@ -42,15 +45,18 @@ public class TranscriptService {
         transcript.setFileName(file.getOriginalFilename());
         transcript.setTranscript(text);
         Transcript saved = repository.save(transcript);
-
-        return TranscriptResponse.fromEntity(saved);
+        String formattedHtml = formatterService.toHtmlDocument(saved.getTranscript(), language);
+        return TranscriptResponse.fromEntity(saved, formattedHtml);
     }
 
     public List<TranscriptResponse> getAll() {
         return repository.findAll()
                 .stream()
                 .sorted((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()))
-                .map(TranscriptResponse::fromEntity)
+                .map(t -> TranscriptResponse.fromEntity(
+                        t,
+                        formatterService.toHtmlDocument(t.getTranscript(), "auto")
+                ))
                 .toList();
     }
 }

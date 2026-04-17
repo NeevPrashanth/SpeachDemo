@@ -124,6 +124,34 @@ input[type="file"] {
   padding: 12px;
 }
 
+.document-preview .white-document {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.document-preview .white-document h3 {
+  margin: 14px 0 8px;
+  font-size: 18px;
+}
+
+.document-preview .white-document p {
+  margin: 8px 0;
+  line-height: 1.6;
+}
+
+.document-preview .white-document ul {
+  margin: 8px 0 8px 18px;
+  padding: 0;
+}
+
+.document-preview .white-document li {
+  border: 0;
+  padding: 0;
+  margin: 6px 0;
+}
+
 small {
   display: block;
   color: #475569;
