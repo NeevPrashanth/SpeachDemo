@@ -19,8 +19,12 @@ public class TranscriptController {
 
     @PostMapping("/upload")
     @ResponseStatus(HttpStatus.CREATED)
-    public TranscriptResponse upload(@RequestParam("file") MultipartFile file) throws IOException {
-        return service.handleUpload(file);
+    public TranscriptResponse upload(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "language", required = false) String language,
+            @RequestParam(value = "keywords", required = false) String keywords
+    ) throws IOException {
+        return service.handleUpload(file, language, keywords);
     }
 
     @GetMapping

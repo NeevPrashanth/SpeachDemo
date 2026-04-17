@@ -27,7 +27,7 @@ public class TranscriptService {
         Files.createDirectories(this.uploadDir);
     }
 
-    public TranscriptResponse handleUpload(MultipartFile file) throws IOException {
+    public TranscriptResponse handleUpload(MultipartFile file, String language, String keywords) throws IOException {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("File is empty");
         }
@@ -36,7 +36,7 @@ public class TranscriptService {
         Path savedPath = uploadDir.resolve(safeName);
         file.transferTo(savedPath);
 
-        String text = sttClient.transcribe(savedPath.toFile());
+        String text = sttClient.transcribe(savedPath.toFile(), language, keywords);
 
         Transcript transcript = new Transcript();
         transcript.setFileName(file.getOriginalFilename());

@@ -25,9 +25,15 @@ public class SttClient {
         this.sttServiceUrl = sttServiceUrl;
     }
 
-    public String transcribe(File audioFile) {
+    public String transcribe(File audioFile, String language, String keywords) {
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("file", new FileSystemResource(audioFile));
+        if (language != null && !language.isBlank()) {
+            body.add("language", language.trim());
+        }
+        if (keywords != null && !keywords.isBlank()) {
+            body.add("keywords", keywords.trim());
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);

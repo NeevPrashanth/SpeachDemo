@@ -14,7 +14,7 @@ public class Transcript {
     private String fileName;
 
     @Lob
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
     private String transcript;
 
     @Column(name = "created_at", nullable = false)
